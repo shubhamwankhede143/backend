@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const moongoDbConnection = require('./db/connection')
 const AuthRoutes = require('./routes/auth')
+const PostRoutes = require('./routes/post')
 const bodyParser = require('body-parser')
 const isDevMode = process.env.NODE_ENV === 'development';
 const app = express()
@@ -86,6 +87,7 @@ app.get('/logout', (req, res) => {
 // app.use('/api',AuthRoutes)
 app.use('/api', AuthRoutes)
 
+app.use('/api', PostRoutes)
 
 
 function randomStr(len, arr) {
@@ -98,8 +100,8 @@ function randomStr(len, arr) {
 }
 // console.log(uuid.v1());
 
-app.listen(3000, () => {
-    console.log('listening on port 3000')
+app.listen(3001, () => {
+    console.log('listening on port 3001')
 })
 
 

@@ -3,31 +3,36 @@ const Schema = mongoose.Schema
 
 
 const userSchema = new Schema({
-    name : {
-        type : String,
-    },
-    email : {
-        type : String,
-    },
-    picture : {
+    name: {
         type: String,
     },
-    role : {
+    email: {
         type: String,
     },
-    social_icon:{
+    picture: {
         type: String,
     },
-    password : {
-        type : String,
-    },descriptions : {
+    slug: {
         type: String,
-    },status : {
+    },
+    role: {
+        type: String,
+    },
+    social_icon: {
+        type: String,
+    },
+    password: {
+        type: String,
+    }, 
+    descriptions: {
+        type: String,
+    }, 
+    status: {
         type: String,
     }
 
-},{timestamps:true})
+}, { timestamps: true })
 
-const User = mongoose.model('User',userSchema)
+const User = mongoose.model('User', userSchema)
 
 module.exports = User

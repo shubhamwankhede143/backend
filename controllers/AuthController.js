@@ -4,9 +4,16 @@ const jwt = require('jsonwebtoken')
 const express = require('express')
 var CryptoJS = require("crypto-js");
 var validator = require("email-validator");
-
-//node rsa
+const asyncRedis = require("async-redis");    
 const NodeRSA = require('node-rsa');
+
+const PORT = process.env.PORT || 3000;
+const REDIS_PORT = process.env.PORT || 6379;
+
+const client = asyncRedis.createClient(); 
+client.on("error", function (error) {
+    console.error(error);
+});
 
 const init = async (req, res, next) => {
     const publicKey = req.body.publicKey
@@ -14,87 +21,87 @@ const init = async (req, res, next) => {
     const key_public = new NodeRSA(publicKey, 'pkcs8-public')
     const apiEncryptionKey = await key_public.encrypt(userSecretKey, 'base64');
     const requestId = await randomStr(40, '12345689abcdefghighklmnopqrstuvwxyz')
-    req.session.requestId = requestId
-    req.session.apiEncryptionKey = apiEncryptionKey
-    req.session.userSecretKey = userSecretKey
-    req.session.save();
-    console.log(req.cookies['connect.sid'])
-    res.set('cookie', req.cookies['connect.sid']);
-    
+  
+    const userDetails = {
+        "requestId": requestId,
+        "userSecretKey": userSecretKey
+    }
+
+    await client.set(requestId, JSON.stringify(userDetails));
     return res.json({
         status: true,
         result: {
             apiEncryptionKey: apiEncryptionKey,
             requestId: requestId,
-            cookie : req.cookies['connect.sid']
         },
         message: 'Init api called'
     })
 };
 
 const getUserDetails = async (req, res) => {
-    const apiEncryptionKey = await req.session.apiEncryptionKey
-    const requestId = await req.session.requestId
-    const userSecretKey = await req.session.userSecretKey
-    console.log(req)
-    console.log(requestId)
-    return res.json({
-        apiEncryptionKey: apiEncryptionKey,
-        requestId: requestId,
-        userSecretKey: userSecretKey
+    // const requestId = req.header('requestId')
+    const requestId = 'f9ilciqvmea1el4shlcut2dhqr1g8cakvp2cwglh';
+    // const apiEncryptionKey = await req.session.apiEncryptionKey
+    // const requestId = await req.session.requestId
+    // const userSecretKey = await req.session.userSecretKey
+    // const userSecretKey = client.get("userSecretKey")
+    // const requestId = client.get("requestId");
+    // console.log(requestId)
+    // return res.json({
+    //     requestId: requestId,
+    //     userSecretKey: userSecretKey
+    // })
+    return client.get(requestId, (err, result) => {
+        // If that key exist in Redis store
+        if (result) {
+            const resultJSON = JSON.parse(result);
+            return res.status(200).json(resultJSON);
+        }
+        if (err) {
+            res.json({
+                status: false,
+                message: 'Invalid request id'
+            })
+        }
     })
 }
 
 const register = async (req, res) => {
     const { email, password } = req.body;
     const requestId = req.header('requestId')
-    const userSecret = req.session.userSecretKey;
-    // if (!userSecret) {
-    //     return res.json({
-    //         status: false
-    //         , message: 'session closed'
-    //     })
-    // }
-
-    // if(!requestId || (requestId!= req.session.requestId)){
-    //     return res.json({
-    //         status:false,
-    //         message:'Request id either empty or invalid'
-    //     })
-    // }
-
     if (!email || !password) {
         return res.json({
             status: false,
             message: 'email or password cant be empty'
         })
     }
+    const value = await client.get(requestId);
+    resultJSON = await JSON.parse(value);
+    const {userNewSecretKey} = await resultJSON
+    // email = Decryption(email, userNewSecretKey)
+    // password = Decryption(password, userNewSecretKey)
 
     const check = await validator.validate(req.body.email);
-    if(!check){
-        res.json({ 
-            status:false,
-            message:'Invalid email address'
+    if (!check) {
+        res.json({
+            status: false,
+            message: 'Invalid email address'
         })
     }
-
     const user = await User.findOne({ email })
-        if (user) {
-            return res.json({
-                status:true,
-                message:'Email address already exists'
-            })
-          }
-
-    // username = Decryption(username, userSecret)
-    // password = Decryption(password, userSecret)
+    if (user) {
+        return res.json({
+            status: true,
+            message: 'Email address already exists'
+        })
+    }    
     console.log('Email :' + email + ' ' + 'Password :' + password)
 
-    bcrypt.hash(req.body.password, 8, function (err, hash) {
+    bcrypt.hash(password, 8, function (err, hash) {
         let user = new User({
             name: req.body.name,
             email: req.body.email,
-            picture: req.body.phone,
+            picture: email,
             role: 'user',
             password: hash,
             description: req.body.description,
@@ -119,41 +126,68 @@ const register = async (req, res) => {
     });
 };
 
-
-
 const login = async (req, res) => {
     const { email, password } = req.body;
-    const userSecret = req.session.userSecretKey;
+    const requestId = req.header('requestId')
+
     if (!email || !password) {
         return res.json({
             status: false,
             message: 'email or password cant be empty'
         })
     }
-    const user = await User.findOne({ email })
-    if (!user) {
+    const value = await client.get(requestId);
+    resultJSON = JSON.parse(value);
+    const {userSecretKey} = await resultJSON
+
+    email = Decryption(email, userSecretKey)
+    password = Decryption(password, userSecretKey)
+    
+    const userData = await User.findOne({ email })
+    if (!userData) {
         return res.json({
-            status:true,
-            message:'Email address not found'
+            status: false,
+            message: 'Email address not found'
         })
-      }
+    }
+    const {_id} = userData   
+    const user = { name: email }
+
+    const userNewSecretKey = await randomStr(24, '12345689abcdefghighklmnopqrstuvwxyz')
+    const newApiEncryptionKey = await Encryption(userNewSecretKey, userSecretKey);
+    const newRequestId = await randomStr(40, '12345689abcdefghighklmnopqrstuvwxyz')
+    const userDetails = {
+        "newRequestId": newRequestId,
+        "userNewSecretKey": userNewSecretKey,
+        
+    }
+
+    await client.set(newRequestId, JSON.stringify(userDetails));
+
+
+    const authToken = jwt.sign(user, 'MY SECRET KEY')
+    return res.json({
+        status: true,
+        result: {
+            authToken: authToken,
+            userId:_id,
+            newApiEncryptionKey:newApiEncryptionKey,
+            newRequestId:newRequestId
+        }
+    })
 }
 
-function validateEmail(email) 
-    {
-        var re = /\S+@\S+\.\S+/;
-        return re.test(email);
-    }
-    
-console.log(validateEmail('anystring@anystring.anystring'));
-
+function validateEmail(email) {
+    var re = /\S+@\S+\.\S+/;
+    return re.test(email);
+}
 
 const Encryption = (data, userSecretKey) => {
     let passPhrase = userSecretKey;
     const encryptionData = CryptoJS.AES.encrypt(data, passPhrase).toString();
     return encryptionData;
 }
-// 
+ 
 const Decryption = (data, userSecretKey) => {
     let passPhrase = userSecretKey;
     const bytes = CryptoJS.AES.decrypt(data, passPhrase);
@@ -176,7 +210,6 @@ function encrypt(text, userSecretKey) {
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     return encrypted.toString('hex') + ':' + iv.toString('hex') + '=' +
         key.toString('hex');
-    //returns encryptedData:iv=key
 }
 
 function decrypt(text) {
@@ -196,26 +229,26 @@ function isEmailValid(email) {
     if (!email)
         return false;
 
-    if(email.length>254)
+    if (email.length > 254)
         return false;
 
     var valid = emailRegex.test(email);
-    if(!valid)
+    if (!valid)
         return false;
 
     // Further checking of some things regex can't handle
     var parts = email.split("@");
-    if(parts[0].length>64)
+    if (parts[0].length > 64)
         return false;
 
     var domainParts = parts[1].split(".");
-    if(domainParts.some(function(part) { return part.length>63; }))
+    if (domainParts.some(function (part) { return part.length > 63; }))
         return false;
 
     return true;
 }
 
 module.exports = {
-    register, init, getUserDetails
+    register, init, getUserDetails, login
 }
 
