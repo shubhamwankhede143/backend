@@ -11,6 +11,8 @@ const session = require('express-session')
 const MongoStore = require('connect-mongo')(session);
 const cookieParser = require('cookie-parser')
 var cors = require('cors')
+const swaggerJsDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 //enables cors
 app.use(cors());
 // app.set('trust proxy', 1)
@@ -19,6 +21,8 @@ app.use(cors());
 if (!isDevMode) {
     app.set('trust proxy', 1);
 }
+
+const swaggerOptions 
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -56,6 +60,8 @@ app.use(bodyParser.urlencoded({
 }))
 
 app.use(bodyParser.json())
+
+app.use('/uploads',express.static('uploads'))
 
 
 const user = {

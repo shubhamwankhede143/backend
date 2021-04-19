@@ -32,6 +32,6 @@ const upload = multer({
 
 
 router.post('/post', upload.single('postImage'), PostController.createPost)
-router.get('/post',PostController.getPost)
+router.get('/post',PostController.getAllPost)
 
 module.exports = router

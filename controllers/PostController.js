@@ -36,8 +36,36 @@ const createPost = async (req, res, next) => {
 
 }
 
+const getAllPost = async (req, res, next) => {
+
+    Post.find()
+    .select("_id userId tagId picture")
+    .exec()
+    .then(posts =>{
+         const response = {
+            count: posts.length,
+            posts : posts.map(post =>{
+                return {
+                    postId : post._id,
+                    userId : post.userId,
+                    picture :'http://localhost:3001/'+ post.picture,
+                    request: {
+                        type : "GET",
+                        url : "http://localhost:3001/posts/" + post._id
+                    }
+                }
+            })
+        }
+         res.json({
+            status : true,
+            result : response,
+            message : 'All post retrieved successfully'
+        })
+    })
+    
+}
 
 
 module.exports = {
-    createPost
+    createPost,getAllPost
 }
