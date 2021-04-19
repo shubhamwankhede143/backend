@@ -51,18 +51,10 @@ const getUserDetails = async (req, res) => {
     //     requestId: requestId,
     //     userSecretKey: userSecretKey
     // })
-    return client.get(requestId, (err, result) => {
-        // If that key exist in Redis store
-        if (result) {
-            const resultJSON = JSON.parse(result);
-            return res.status(200).json(resultJSON);
-        }
-        if (err) {
-            res.json({
-                status: false,
-                message: 'Invalid request id'
-            })
-        }
+    const value = await client.get(requestId);
+    resultJSON = await JSON.parse(value);
+    return res.json({
+        data : resultJSON
     })
 }
 
@@ -78,8 +70,8 @@ const register = async (req, res) => {
     const value = await client.get(requestId);
     resultJSON = await JSON.parse(value);
     const {userNewSecretKey} = await resultJSON
-    // email = Decryption(email, userNewSecretKey)
-    // password = Decryption(password, userNewSecretKey)
+    email = Decryption(email, userNewSecretKey)
+    password = Decryption(password, userNewSecretKey)
 
     const check = await validator.validate(req.body.email);
     if (!check) {
@@ -127,8 +119,8 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-    const { email, password } = req.body;
-    const requestId = req.header('requestId')
+    var { email, password } = req.body;
+    var requestId = req.header('requestId')
 
     if (!email || !password) {
         return res.json({
@@ -171,8 +163,8 @@ const login = async (req, res) => {
         result: {
             authToken: authToken,
             userId:_id,
-            newApiEncryptionKey:newApiEncryptionKey,
-            newRequestId:newRequestId
+            apiEncryptionKey:newApiEncryptionKey,
+            requestId:newRequestId
         }
     })
 }

@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const moongoDbConnection = require('./db/connection')
 const AuthRoutes = require('./routes/auth')
 const PostRoutes = require('./routes/post')
+const FileRoutes = require('./routes/file')
 const bodyParser = require('body-parser')
 const isDevMode = process.env.NODE_ENV === 'development';
 const app = express()
@@ -11,8 +12,8 @@ const session = require('express-session')
 const MongoStore = require('connect-mongo')(session);
 const cookieParser = require('cookie-parser')
 var cors = require('cors')
-const swaggerJsDoc = require('swagger-jsdoc')
-const swaggerUi = require('swagger-ui-express')
+// const swaggerJsDoc = require('swagger-jsdoc')
+// const swaggerUi = require('swagger-ui-express')
 //enables cors
 app.use(cors());
 // app.set('trust proxy', 1)
@@ -22,7 +23,6 @@ if (!isDevMode) {
     app.set('trust proxy', 1);
 }
 
-const swaggerOptions 
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -94,6 +94,7 @@ app.get('/logout', (req, res) => {
 app.use('/api', AuthRoutes)
 
 app.use('/api', PostRoutes)
+app.use('/api', FileRoutes)
 
 
 function randomStr(len, arr) {
