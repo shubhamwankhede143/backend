@@ -12,6 +12,7 @@ const session = require('express-session')
 const MongoStore = require('connect-mongo')(session);
 const cookieParser = require('cookie-parser')
 var cors = require('cors')
+const PORT = 3000;
 // const swaggerJsDoc = require('swagger-jsdoc')
 // const swaggerUi = require('swagger-ui-express')
 //enables cors
@@ -107,9 +108,6 @@ function randomStr(len, arr) {
 }
 // console.log(uuid.v1());
 
-app.listen(3001, () => {
-    console.log('listening on port 3001')
+app.listen(PORT, () => {
+    console.log(`listening on port ${PORT}`)
 })
-
-
-

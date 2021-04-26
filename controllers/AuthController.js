@@ -4,13 +4,18 @@ const jwt = require('jsonwebtoken')
 const express = require('express')
 var CryptoJS = require("crypto-js");
 var validator = require("email-validator");
-const asyncRedis = require("async-redis");    
+const asyncRedis = require("async-redis");
+const redisClient = require('../redis-client');    
 const NodeRSA = require('node-rsa');
 
 const PORT = process.env.PORT || 3000;
 const REDIS_PORT = process.env.PORT || 6379;
 
-const client = asyncRedis.createClient(); 
+const client = asyncRedis.createClient({
+    host: 'redis',
+    port: 6379
+});
+
 client.on("error", function (error) {
     console.error(error);
 });
@@ -27,7 +32,8 @@ const init = async (req, res, next) => {
         "userSecretKey": userSecretKey
     }
 
-    await client.set(requestId, JSON.stringify(userDetails));
+    // await client.set(requestId, JSON.stringify(userDetails));
+    await redisClient.setAsync(requestId, JSON.stringify(userDetails));
     return res.json({
         status: true,
         result: {
@@ -39,8 +45,8 @@ const init = async (req, res, next) => {
 };
 
 const getUserDetails = async (req, res) => {
-    // const requestId = req.header('requestId')
-    const requestId = 'f9ilciqvmea1el4shlcut2dhqr1g8cakvp2cwglh';
+    const requestId = req.header('requestId')
+    // const requestId = 'f9ilciqvmea1el4shlcut2dhqr1g8cakvp2cwglh';
     // const apiEncryptionKey = await req.session.apiEncryptionKey
     // const requestId = await req.session.requestId
     // const userSecretKey = await req.session.userSecretKey
@@ -51,8 +57,9 @@ const getUserDetails = async (req, res) => {
     //     requestId: requestId,
     //     userSecretKey: userSecretKey
     // })
-    const value = await client.get(requestId);
-    resultJSON = await JSON.parse(value);
+    // const value = await client.get(requestId);
+    const rawData = await redisClient.getAsync(requestId);
+    resultJSON = await JSON.parse(rawData);
     return res.json({
         data : resultJSON
     })
@@ -67,8 +74,10 @@ const register = async (req, res) => {
             message: 'email or password cant be empty'
         })
     }
-    const value = await client.get(requestId);
-    resultJSON = await JSON.parse(value);
+    // const value = await client.get(requestId);
+    // resultJSON = await JSON.parse(value);
+    const rawData = await redisClient.getAsync(requestId);
+    resultJSON = await JSON.parse(rawData);
     const {userNewSecretKey} = await resultJSON
     email = Decryption(email, userNewSecretKey)
     password = Decryption(password, userNewSecretKey)

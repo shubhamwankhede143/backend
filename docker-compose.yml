@@ -1,0 +1,48 @@
+# docker-compose.yml
+# docker-compose.yml
+# Add this top-level entry
+version: '3.3'
+
+services:
+    redis:
+        image: redis
+        container_name: cache
+        expose:
+            - 6379
+
+
+    app:
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        image: 'aiknow123/blog3:latest'
+        links:
+            - redis
+        environment:
+            - REDIS_URL=redis://cache
+        volumes:
+            - ./:/var/www/app
+        ports:
+            - 3000:3000
+        command:
+            sh -c 'npm i && node app.js'
+
+
+
+      
+# services:
+#     web:
+#         build: .
+#         ports:
+#             - 3000:3000
+#         image: 'aiknow123/blog5:latest'
+#         links:
+#             - redis
+#         environment:
+#             - REDIS_URL=redis://cache
+#         volumes:
+#             - ./:/var/www/app
+#         command:
+#             sh -c 'npm i && node app.js'
+#     redis:
+#         image: 'redis:alpine'

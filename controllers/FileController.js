@@ -20,7 +20,6 @@ const createFile = async (req, res, next) => {
                 message: 'Error occured while adding image file'
             })
         })
-
 }
 
 module.exports = {
