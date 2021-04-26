@@ -6,9 +6,6 @@ version: '3.3'
 services:
     redis:
         image: redis
-        networks:
-            testing_net:
-                ipv4_address: 3.15.45.31
         container_name: cache
         expose:
             - 6379
