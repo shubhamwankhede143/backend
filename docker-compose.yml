@@ -28,7 +28,10 @@ services:
             sh -c 'npm i && node app.js'
 
 
-
+        networks:
+            default:
+                external:
+                    name: i-already-created-this
       
 # services:
 #     web:
