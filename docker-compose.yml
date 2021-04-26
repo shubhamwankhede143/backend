@@ -10,7 +10,6 @@ services:
         expose:
             - 6379
 
-
     app:
         build: 
             context: .
@@ -20,13 +19,10 @@ services:
             - redis
         environment:
             - REDIS_URL=redis://cache
-        networks:
-            credentials_network:
-                ipv4_address: "3.15.45.31"
         volumes:
             - ./:/var/www/app
         ports:
-            - 3000:3000
+            - 8080:8080
         command:
             sh -c 'npm i && node app.js'
       
