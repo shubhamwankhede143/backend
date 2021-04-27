@@ -74,8 +74,8 @@ const register = async (req, res) => {
             message: 'email or password cant be empty'
         })
     }
-    // const value = await client.get(requestId);
-    // resultJSON = await JSON.parse(value);
+    const value = await client.get(requestId);
+    resultJSON = await JSON.parse(value);
     const rawData = await redisClient.getAsync(requestId);
     resultJSON = await JSON.parse(rawData);
     const {userNewSecretKey} = await resultJSON
@@ -101,9 +101,9 @@ const register = async (req, res) => {
     bcrypt.hash(password, 8, function (err, hash) {
         let user = new User({
             name: req.body.name,
-            email: req.body.email,
-            picture: email,
-            role: 'user',
+            email: email,
+            picture: req.body.picture,
+            role: 'admin',
             password: hash,
             description: req.body.description,
             status: req.body.status

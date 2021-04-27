@@ -1,6 +1,8 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const moongoDbConnection = require('./db/connection')
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express')
 const AuthRoutes = require('./routes/auth')
 const PostRoutes = require('./routes/post')
 const FileRoutes = require('./routes/file')
@@ -13,8 +15,7 @@ const MongoStore = require('connect-mongo')(session);
 const cookieParser = require('cookie-parser')
 var cors = require('cors')
 const PORT = 8080;
-// const swaggerJsDoc = require('swagger-jsdoc')
-// const swaggerUi = require('swagger-ui-express')
+
 //enables cors
 app.use(cors());
 // app.set('trust proxy', 1)
@@ -31,16 +32,6 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Credentials", true);
     next();
 });
-
-// var corsOptions = {
-//     origin: function (origin, callback) {
-//       // db.loadOrigins is an example call to load
-//       // a list of origins from a backing database
-//       db.loadOrigins(function (error, origins) {
-//         callback(error, origins)
-//       })
-//     }
-//   }
 
 
 app.use(session({
@@ -60,6 +51,36 @@ app.use(bodyParser.urlencoded({
 }))
 
 app.use(bodyParser.json())
+// // app.js
+// const definition = {  // <-----
+//   openapi: '3.0.0',
+//   info: {
+//     title: 'Express API for JSONPlaceholder',
+//     version: '1.0.0',
+//   },
+//   };
+  
+//   const options = {
+//     definition,      // <-----
+//     apis: ['./routes/*.js'],
+//   };
+
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'NDX BLOGS API DOCUMENTATION',
+    version: '1.0.0',
+  },
+};
+
+const options = {
+  swaggerDefinition,
+  // Paths to files containing OpenAPI definitions
+  apis: ['./routes/*.js'],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.use('/uploads',express.static('uploads'))
 
@@ -78,6 +99,7 @@ app.get('/login', (req, res) => {
     return res.send('User logged in successfully')
 })
 
+ 
 app.get('/user',(req,res)=>{
     return res.send(req.session.user)
 })
