@@ -74,8 +74,6 @@ const register = async (req, res) => {
             message: 'email or password cant be empty'
         })
     }
-    const value = await client.get(requestId);
-    resultJSON = await JSON.parse(value);
     const rawData = await redisClient.getAsync(requestId);
     resultJSON = await JSON.parse(rawData);
     const {userNewSecretKey} = await resultJSON
@@ -95,7 +93,7 @@ const register = async (req, res) => {
             status: true,
             message: 'Email address already exists'
         })
-    }    
+    }
     console.log('Email :' + email + ' ' + 'Password :' + password)
     const social = await JSON.stringify(req.body.socialAccount)
 
@@ -125,7 +123,6 @@ const register = async (req, res) => {
                     message: 'Error occured while adding user'
                 })
             })
-
     });
 };
 
