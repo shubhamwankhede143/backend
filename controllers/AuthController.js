@@ -83,7 +83,7 @@ const register = async (req, res) => {
 
     const check = await validator.validate(req.body.email);
     if (!check) {
-        res.json({
+        return res.json({
             status: false,
             message: 'Invalid email address'
         })
