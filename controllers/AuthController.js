@@ -66,7 +66,7 @@ const getUserDetails = async (req, res) => {
 }
 
 const register = async (req, res) => {
-    const { email, password } = req.body;
+    var { email, password } = req.body;
     const requestId = req.header('requestId')
     if (!email || !password) {
         return res.json({
