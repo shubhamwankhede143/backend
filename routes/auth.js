@@ -28,6 +28,28 @@ const AuthController = require('../controllers/AuthController')
  *         type: string
  */
 
+
+/**
+ * @swagger
+ * /api/init:
+ *   post:
+ *     tags:
+ *       - Init api
+ *     description: Init api 
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: publicKey
+ *         description: Client public key
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Init api call successfully
+ */
+router.post('/init',AuthController.init)
+
 /**
  * @swagger
  * /api/register:
@@ -89,8 +111,30 @@ const AuthController = require('../controllers/AuthController')
 router.post('/register',AuthController.register)
 
 
-router.post('/init',AuthController.init)
-
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     tags:
+ *       - User Login
+ *     description: User Login
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: username
+ *         description: User username
+ *         in: body
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: User password
+ *         in: body
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: User successfully logged in
+ */
 router.post('/login',AuthController.login)
 
 router.get('/user',AuthController.getUserDetails)

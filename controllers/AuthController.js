@@ -97,16 +97,18 @@ const register = async (req, res) => {
         })
     }    
     console.log('Email :' + email + ' ' + 'Password :' + password)
+    const social = await JSON.stringify(req.body.socialAccount)
 
     bcrypt.hash(password, 8, function (err, hash) {
         let user = new User({
             name: req.body.name,
             email: email,
             picture: req.body.picture,
-            role: 'admin',
+            banner: req.body.banner,
+            role: req.body.role,
+            socialAccount: social,
             password: hash,
-            description: req.body.description,
-            status: req.body.status
+            status: "User Registered"
         })
 
         user.save()

@@ -9,22 +9,19 @@ const userSchema = new Schema({
     email: {
         type: String,
     },
-    picture: {
+    banner: {
         type: String,
     },
-    slug: {
+    picture: {
         type: String,
     },
     role: {
         type: String,
     },
-    social_icon: {
+    socialAccount: {
         type: String,
     },
     password: {
-        type: String,
-    }, 
-    descriptions: {
         type: String,
     }, 
     status: {
