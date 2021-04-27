@@ -79,7 +79,7 @@ const register = async (req, res) => {
     const {userNewSecretKey} = await resultJSON
     email = Decryption(email, userNewSecretKey)
     password = Decryption(password, userNewSecretKey)
-    console.log(email +" email", password)
+    console.log("email :"+email , "password : "+password)
 
     const check = await validator.validate(req.body.email);
     if (!check) {
