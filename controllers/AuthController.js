@@ -178,6 +178,28 @@ const login = async (req, res) => {
     })
 }
 
+
+const getAllUser = async (req, res, next) => {
+    var { page , size } = req.body
+    var { field , order } = req.body.sortBy
+    page = page - 1
+    User.find()
+        .select("name email banner picture role socialAccount status")
+        .sort({ field: order })
+        .limit(size)
+        .skip(size * page)
+        .then((results) => {
+            return res.json({
+                page:page+1,
+                size:size,
+                results:results
+            })
+        })
+        .catch((err) => {
+            return res.status(500).send(err);
+        });
+}
+
 function validateEmail(email) {
     var re = /\S+@\S+\.\S+/;
     return re.test(email);
@@ -250,6 +272,6 @@ function isEmailValid(email) {
 }
 
 module.exports = {
-    register, init, getUserDetails, login
+    register, init, getUserDetails, login,getAllUser
 }
 
