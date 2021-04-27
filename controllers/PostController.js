@@ -40,7 +40,7 @@ const getAllPost = async (req, res, next) => {
     var { page , size } = req.body
     var { field , order } = req.body.sortBy
     page = page - 1
-    Post.find()
+    Post.find(req.body.condition)
         .select("postId userId banner picture picture request")
         .sort({ field: order })
         .limit(size)
