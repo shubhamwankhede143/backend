@@ -3,7 +3,6 @@ const router = express.Router();
 var multer = require('multer')
 const PostController = require('../controllers/PostController')
 
-
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './uploads/')
@@ -29,9 +28,7 @@ const upload = multer({
     fileFilter:fileFilter
 })
 
-
-
 router.post('/post', upload.single('postImage'), PostController.createPost)
-router.get('/post',PostController.getAllPost)
+router.post('/posts',PostController.getAllPost)
 
 module.exports = router

@@ -37,33 +37,54 @@ const createPost = async (req, res, next) => {
 }
 
 const getAllPost = async (req, res, next) => {
-
+    var { page , size } = req.body
+    var { field , order } = req.body.sortBy
+    page = page - 1
     Post.find()
-    .select("_id userId tagId picture")
-    .exec()
-    .then(posts =>{
-         const response = {
-            count: posts.length,
-            posts : posts.map(post =>{
-                return {
-                    postId : post._id,
-                    userId : post.userId,
-                    picture :'http://localhost:3001/'+ post.picture,
-                    request: {
-                        type : "GET",
-                        url : "http://localhost:3001/posts/" + post._id
-                    }
-                }
+        .select("postId userId banner picture picture request")
+        .sort({ field: order })
+        .limit(size)
+        .skip(size * page)
+        .then((results) => {
+            return res.json({
+                page:page+1,
+                size:size,
+                results:results
             })
-        }
-         res.json({
-            status : true,
-            result : response,
-            message : 'All post retrieved successfully'
         })
-    })
-    
+        .catch((err) => {
+            return res.status(500).send(err);
+        });
 }
+
+
+// const getAllPost = async (req, res, next) => {
+
+//     Post.find()
+//     .select("_id userId tagId picture")
+//     .exec()
+//     .then(posts =>{
+//          const response = {
+//             count: posts.length,
+//             posts : posts.map(post =>{
+//                 return {
+//                     postId : post._id,
+//                     userId : post.userId,
+//                     picture :'http://localhost:3001/'+ post.picture,
+//                     request: {
+//                         type : "GET",
+//                         url : "http://localhost:3001/posts/" + post._id
+//                     }
+//                 }
+//             })
+//         }
+//          res.json({
+//             status : true,
+//             result : response,
+//             message : 'All post retrieved successfully'
+//         })
+//     })
+// }
 
 
 module.exports = {
