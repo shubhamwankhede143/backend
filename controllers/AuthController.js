@@ -180,10 +180,12 @@ const login = async (req, res) => {
 
 
 const getAllUser = async (req, res, next) => {
-    var { page , size } = req.body
+    var { page , size ,status} = req.body
     var { field , order } = req.body.sortBy
+    const {  condition ,fieldName} = req.body.condition
     page = page - 1
-    User.find()
+    await User.find({})
+        .where(fieldName).equals(condition)
         .select("name email banner picture role socialAccount status")
         .sort({ field: order })
         .limit(size)
