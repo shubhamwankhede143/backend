@@ -28,7 +28,9 @@ const upload = multer({
     fileFilter:fileFilter
 })
 
-router.post('/post', upload.single('postImage'), PostController.createPost)
+router.post('/post', PostController.createPost)
 router.post('/posts',PostController.getAllPost)
+router.put('/post/:postId',PostController.updatePost)
+router.get('/post/:postId',PostController.getPost)
 
 module.exports = router

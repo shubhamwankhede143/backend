@@ -20,10 +20,7 @@ const postSchema = new Schema({
     content: {
         type: String,
     },
-    commentStatus: {
-        type: String,
-    },
-    isFeature: {
+    sortDescription:{
         type: String,
     },
     status: {
