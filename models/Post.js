@@ -5,8 +5,8 @@ const postSchema = new Schema({
     userId: {
         type: String,
     },
-    tagId: {
-        type: String,
+    tagIds: {
+        type:Array,
     },
     picture: {
         type: String,
@@ -20,7 +20,7 @@ const postSchema = new Schema({
     content: {
         type: String,
     },
-    sortDescription:{
+    sortDescription: {
         type: String,
     },
     status: {

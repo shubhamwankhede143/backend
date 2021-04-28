@@ -3,11 +3,9 @@ const Post = require("../models/Post")
 
 
 const createPost = async (req, res, next) => {
-
-
     let post = new Post({
         userId: req.body.userId,
-        tagId: req.body.tagId,
+        tagIds: req.body.tagIds,
         picture: req.body.picture,
         title: req.body.title,
         slug: req.body.slug,
@@ -62,6 +60,24 @@ const updatePost = (req, res) => {
             message: "Data to update can not be empty!"
         });
     }
+    const userId = req.body.userId
+    Post.findById(userId)
+        .then(data => {
+            if (!data)
+                res.status(404).json({
+                    status:false,
+                    message: "Not found Post with id " + id });
+            else res.json({
+                status:true,
+                message:'Post data retrieved successfully',
+                result : data
+            });
+        })
+        .catch(err => {
+            res
+                .status(500)
+                .send({ message: "Error retrieving Post with id=" + id });
+        });
 
     const id = req.params.postId;
 
@@ -89,7 +105,7 @@ const getAllPost = async (req, res, next) => {
     var { field, order } = req.body.sortBy
     page = page - 1
     Post.find(req.body.condition)
-        .select("postId userId banner picture picture request")
+        .select("postId userId tagIds picture title slug content sortDescription status verifiedBy")
         .sort({ field: order })
         .limit(size)
         .skip(size * page)
@@ -104,6 +120,28 @@ const getAllPost = async (req, res, next) => {
             return res.status(500).send(err);
         });
 }
+
+const getAllPostByTagIds = async (req, res, next) => {
+    var { page, size } = req.body
+    var { field, order } = req.body.sortBy
+    page = page - 1
+    Post.find({ "tagIds": { $in: req.body.tagIds }})
+        .select("postId userId tagIds picture title slug content sortDescription status verifiedBy")
+        .sort({ field: order })
+        .limit(size)
+        .skip(size * page)
+        .then((results) => {
+            return res.json({
+                page: page + 1,
+                size: size,
+                results: results
+            })
+        })
+        .catch((err) => {
+            return res.status(500).send(err);
+        });
+}
+
 
 
 // const getAllPost = async (req, res, next) => {
@@ -136,5 +174,5 @@ const getAllPost = async (req, res, next) => {
 
 
 module.exports = {
-    createPost, getAllPost, updatePost, getPost
+    createPost, getAllPost, updatePost, getPost,getAllPostByTagIds
 }
