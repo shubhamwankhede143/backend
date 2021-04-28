@@ -6,6 +6,7 @@ const swaggerUi = require('swagger-ui-express')
 const AuthRoutes = require('./routes/auth')
 const PostRoutes = require('./routes/post')
 const FileRoutes = require('./routes/file')
+const TagRoutes = require('./routes/tag')
 const bodyParser = require('body-parser')
 const isDevMode = process.env.NODE_ENV === 'development';
 const app = express()
@@ -117,6 +118,7 @@ app.use('/api', AuthRoutes)
 
 app.use('/api', PostRoutes)
 app.use('/api', FileRoutes)
+app.use('/api', TagRoutes)
 
 
 function randomStr(len, arr) {
