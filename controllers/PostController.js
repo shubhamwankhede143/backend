@@ -39,12 +39,13 @@ const getPost = (req, res) => {
         .then(data => {
             if (!data)
                 res.status(404).json({
-                    status:false,
-                    message: "Not found Post with id " + id });
+                    status: false,
+                    message: "Not found Post with id " + id
+                });
             else res.json({
-                status:true,
-                message:'Post data retrieved successfully',
-                result : data
+                status: true,
+                message: 'Post data retrieved successfully',
+                result: data
             });
         })
         .catch(err => {
@@ -65,12 +66,13 @@ const updatePost = (req, res) => {
         .then(data => {
             if (!data)
                 res.status(404).json({
-                    status:false,
-                    message: "Not found Post with id " + id });
+                    status: false,
+                    message: "Not found Post with id " + id
+                });
             else res.json({
-                status:true,
-                message:'Post data retrieved successfully',
-                result : data
+                status: true,
+                message: 'Post data retrieved successfully',
+                result: data
             });
         })
         .catch(err => {
@@ -126,20 +128,22 @@ const getAllPostByTagIds = async (req, res, next) => {
     var { field, order } = req.body.sortBy
     page = page - 1
     var count;
-    Post.find({ "tagIds": { $in: req.body.tagIds }})
+    Post.find({ "tagIds": { $in: req.body.tagIds } })
         .select("postId userId tagIds picture title slug content sortDescription status verifiedBy")
         .sort({ field: order })
         .limit(size)
         .skip(size * page)
         .then((results) => {
-            Post.countDocuments({ "tagIds": { $in: req.body.tagIds }},(err,count)=>{
+            Post.countDocuments({ "tagIds": { $in: req.body.tagIds } }, (err, count) => {
                 return res.json({
                     page: page + 1,
                     size: size,
-                    totalElements:count,
+                    totalElements: count,
                     results: results
                 })
             })
+
+
         })
         .catch((err) => {
             console.log(err)
@@ -147,6 +151,28 @@ const getAllPostByTagIds = async (req, res, next) => {
         });
 }
 
+const getPostCount = async (req, res)=>{
+    var totalPostCount;
+    var totalPublishedPost;
+    var totalUnPublishedPost;
+    await Post.countDocuments({}, (err, count) => {
+        totalPostCount = count
+    })
+    await Post.countDocuments({"status":"published"}, (err, count) => {
+        totalPublishedPost = count
+    })
+     await Post.countDocuments({"status":"unpublished"}, (err, count) => {
+        totalUnPublishedPost = count
+    })
+
+    return res.json({
+        status:true,
+        message:'posts count fetched successfully',
+        totalPost : totalPostCount,
+        totalPublishedPost: totalPublishedPost,
+        totalUnPublishedPost: totalUnPublishedPost
+    })
+}
 
 
 // const getAllPost = async (req, res, next) => {
@@ -179,5 +205,5 @@ const getAllPostByTagIds = async (req, res, next) => {
 
 
 module.exports = {
-    createPost, getAllPost, updatePost, getPost,getAllPostByTagIds
+    createPost, getAllPost, updatePost, getPost, getAllPostByTagIds,getPostCount
 }
