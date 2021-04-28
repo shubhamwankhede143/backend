@@ -30,7 +30,7 @@ const upload = multer({
 
 router.post('/post', PostController.createPost)
 router.post('/posts',PostController.getAllPost)
-router.get('/posts',PostController.getPostCount)
+router.get('/postscount',PostController.getPostCount)
 router.post('/tagposts',PostController.getAllPostByTagIds)
 router.put('/post/:postId',PostController.updatePost)
 router.get('/post/:postId',PostController.getPost)
