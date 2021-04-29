@@ -5,7 +5,7 @@ const express = require('express')
 var CryptoJS = require("crypto-js");
 var validator = require("email-validator");
 const asyncRedis = require("async-redis");
-const redisClient = require('../redis-client');    
+const redisClient = require('../redis-client');
 const NodeRSA = require('node-rsa');
 
 const PORT = process.env.PORT || 3000;
@@ -26,7 +26,7 @@ const init = async (req, res, next) => {
     const key_public = new NodeRSA(publicKey, 'pkcs8-public')
     const apiEncryptionKey = await key_public.encrypt(userSecretKey, 'base64');
     const requestId = await randomStr(40, '12345689abcdefghighklmnopqrstuvwxyz')
-  
+
     const userDetails = {
         "requestId": requestId,
         "userSecretKey": userSecretKey
@@ -65,7 +65,7 @@ const getUserDetails = async (req, res) => {
         });
 }
 
-const updateUser = async (req,res) => {
+const updateUser = async (req, res) => {
 
     const id = req.params.userId;
 
@@ -99,10 +99,10 @@ const register = async (req, res) => {
     }
     const rawData = await redisClient.getAsync(requestId);
     resultJSON = await JSON.parse(rawData);
-    const {userNewSecretKey} = await resultJSON
+    const { userNewSecretKey } = await resultJSON
     email = Decryption(email, userNewSecretKey)
     password = Decryption(password, userNewSecretKey)
-    console.log("email :"+email , "password : "+password)
+    console.log("email :" + email, "password : " + password)
 
     const check = await validator.validate(email);
     if (!check) {
@@ -162,37 +162,63 @@ const login = async (req, res) => {
     }
     const value = await client.get(requestId);
     resultJSON = JSON.parse(value);
-    const {userSecretKey} = await resultJSON
+    const { userSecretKey } = await resultJSON
 
     email = Decryption(email, userSecretKey)
     password = Decryption(password, userSecretKey)
 
     console.log('Email :' + email + ' ' + 'Password :' + password)
-    const userData = await User.find({email: email})
-    .exec()
-    .then(userDetail=>{
-        if(userDetail.length<1){
-            return res.json({
-                    status:false,
-                    message: 'Auth failed'
-            })
-        }
-         bcrypt.compare(password, userDetail.password,(err,res)=>{
-            if(err){
+    const userData = await User.find({ email: email })
+        .exec()
+        .then(userDetail => {
+            if (userDetail.length < 1) {
                 return res.json({
-                    status:false,
+                    status: false,
                     message: 'Auth failed'
                 })
             }
+            bcrypt.compare(password, userDetail.password, async (err, res) => {
+                if (err) {
+                    return res.json({
+                        status: false,
+                        message: 'Auth failed'
+                    })
+                }
+                if (res) {
+                    const { _id } = userDetail
+                    const user = { name: email }
+
+                    const userNewSecretKey = await randomStr(24, '12345689abcdefghighklmnopqrstuvwxyz')
+                    const newApiEncryptionKey = await Encryption(userNewSecretKey, userSecretKey);
+                    const newRequestId = await randomStr(40, '12345689abcdefghighklmnopqrstuvwxyz')
+                    const userDetails = {
+                        "newRequestId": newRequestId,
+                        "userNewSecretKey": userNewSecretKey,
+
+                    }
+
+                    await client.set(newRequestId, JSON.stringify(userDetails));
+                    const authToken = jwt.sign(user, 'MY SECRET KEY')
+                    return res.json({
+                        status: true,
+                        result: {
+                            authToken: authToken,
+                            userId: _id,
+                            apiEncryptionKey: newApiEncryptionKey,
+                            requestId: newRequestId
+                        }
+                    })
+
+                }
+            })
+        }).catch(err => {
+            console.log(err)
+            res.status(500).json({
+                status: false,
+                error: err,
+                message: 'Auth failed'
+            })
         })
-    }).catch(err =>{
-        console.log(err)
-        res.status(500).json({
-            status:false,
-            error: err,
-            message: 'Auth failed'
-        })
-    })
     // const userData = await User.findOne({ email })
     // console.log(userData.password)
     // if (!userData) {
@@ -210,38 +236,12 @@ const login = async (req, res) => {
     //       })
     //     }
     //   })
-
-    const {_id} = userData   
-    const user = { name: email }
-
-    const userNewSecretKey = await randomStr(24, '12345689abcdefghighklmnopqrstuvwxyz')
-    const newApiEncryptionKey = await Encryption(userNewSecretKey, userSecretKey);
-    const newRequestId = await randomStr(40, '12345689abcdefghighklmnopqrstuvwxyz')
-    const userDetails = {
-        "newRequestId": newRequestId,
-        "userNewSecretKey": userNewSecretKey,
-        
-    }
-
-    await client.set(newRequestId, JSON.stringify(userDetails));
-
-
-    const authToken = jwt.sign(user, 'MY SECRET KEY')
-    return res.json({
-        status: true,
-        result: {
-            authToken: authToken,
-            userId:_id,
-            apiEncryptionKey:newApiEncryptionKey,
-            requestId:newRequestId
-        }
-    })
 }
 
 
 const getAllUser = async (req, res, next) => {
-    var { page , size } = req.body
-    const {  order ,field} = req.body.sortBy
+    var { page, size } = req.body
+    const { order, field } = req.body.sortBy
     page = page - 1
     await User.find(req.body.conditions)
         .select("name email banner picture role socialAccount status")
@@ -250,9 +250,9 @@ const getAllUser = async (req, res, next) => {
         .skip(size * page)
         .then((results) => {
             return res.json({
-                page:page+1,
-                size:size,
-                results:results
+                page: page + 1,
+                size: size,
+                results: results
             })
         })
         .catch((err) => {
@@ -270,7 +270,7 @@ const Encryption = (data, userSecretKey) => {
     const encryptionData = CryptoJS.AES.encrypt(data, passPhrase).toString();
     return encryptionData;
 }
- 
+
 const Decryption = (data, userSecretKey) => {
     let passPhrase = userSecretKey;
     const bytes = CryptoJS.AES.decrypt(data, passPhrase);
@@ -332,5 +332,5 @@ function isEmailValid(email) {
 }
 
 module.exports = {
-    register, init, getUserDetails, login,getAllUser,updateUser
+    register, init, getUserDetails, login, getAllUser, updateUser
 }
