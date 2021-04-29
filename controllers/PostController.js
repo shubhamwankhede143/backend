@@ -61,25 +61,7 @@ const updatePost = (req, res) => {
             message: "Data to update can not be empty!"
         });
     }
-    const userId = req.body.userId
-    Post.findById(userId)
-        .then(data => {
-            if (!data)
-                res.status(404).json({
-                    status: false,
-                    message: "Not found Post with id " + id
-                });
-            else res.json({
-                status: true,
-                message: 'Post data retrieved successfully',
-                result: data
-            });
-        })
-        .catch(err => {
-            res
-                .status(500)
-                .send({ message: "Error retrieving Post with id=" + id });
-        });
+   
 
     const id = req.params.postId;
 
@@ -207,3 +189,4 @@ const getPostCount = async (req, res)=>{
 module.exports = {
     createPost, getAllPost, updatePost, getPost, getAllPostByTagIds,getPostCount
 }
+//getPostCount

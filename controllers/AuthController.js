@@ -45,24 +45,47 @@ const init = async (req, res, next) => {
 };
 
 const getUserDetails = async (req, res) => {
-    const requestId = req.header('requestId')
-    // const requestId = 'f9ilciqvmea1el4shlcut2dhqr1g8cakvp2cwglh';
-    // const apiEncryptionKey = await req.session.apiEncryptionKey
-    // const requestId = await req.session.requestId
-    // const userSecretKey = await req.session.userSecretKey
-    // const userSecretKey = client.get("userSecretKey")
-    // const requestId = client.get("requestId");
-    // console.log(requestId)
-    // return res.json({
-    //     requestId: requestId,
-    //     userSecretKey: userSecretKey
-    // })
-    // const value = await client.get(requestId);
-    const rawData = await redisClient.getAsync(requestId);
-    resultJSON = await JSON.parse(rawData);
-    return res.json({
-        data : resultJSON
-    })
+    const id = req.params.userId;
+    User.findById(id)
+        .then(data => {
+            if (!data)
+                res.status(404).json({
+                    status: false,
+                    message: "Not found User with id " + id
+                });
+            else res.json({
+                status: true,
+                message: 'User data retrieved successfully',
+                result: data
+            });
+        })
+        .catch(err => {
+            res.status(500)
+                .send({ message: "Error retrieving User with id=" + id });
+        });
+}
+
+const updateUser = async (req,res) => {
+
+    const id = req.params.userId;
+
+    User.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+        .then(data => {
+            if (!data) {
+                res.status(404).json({
+                    status: false,
+                    message: `Cannot update User with id=${id}. Maybe User was not found!`
+                });
+            } else res.json({
+                status: true,
+                message: "User updated successfully."
+            });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Error updating User with id=" + id
+            });
+        });
 }
 
 const register = async (req, res) => {
@@ -74,11 +97,11 @@ const register = async (req, res) => {
             message: 'email or password cant be empty'
         })
     }
-    const rawData = await redisClient.getAsync(requestId);
-    resultJSON = await JSON.parse(rawData);
-    const {userNewSecretKey} = await resultJSON
-    email = Decryption(email, userNewSecretKey)
-    password = Decryption(password, userNewSecretKey)
+    // const rawData = await redisClient.getAsync(requestId);
+    // resultJSON = await JSON.parse(rawData);
+    // const {userNewSecretKey} = await resultJSON
+    // email = Decryption(email, userNewSecretKey)
+    // password = Decryption(password, userNewSecretKey)
     console.log("email :"+email , "password : "+password)
 
     const check = await validator.validate(email);
@@ -272,6 +295,5 @@ function isEmailValid(email) {
 }
 
 module.exports = {
-    register, init, getUserDetails, login,getAllUser
+    register, init, getUserDetails, login,getAllUser,updateUser
 }
-

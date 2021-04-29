@@ -137,7 +137,9 @@ router.post('/register',AuthController.register)
  */
 router.post('/login',AuthController.login)
 
-// router.get('/user',AuthController.getUserDetails)
+router.get('/user/:userId',AuthController.getUserDetails)
+
+router.put('/user/:userId',AuthController.updateUser)
 
 
 router.post('/users',AuthController.getAllUser)
