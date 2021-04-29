@@ -177,6 +177,7 @@ const login = async (req, res) => {
                     message: 'User not found'
                 })
             }
+            console.log(userDetail.role)
             if(userDetail.role!='1'){
                 return res.json({
                     status: false,
