@@ -97,11 +97,11 @@ const register = async (req, res) => {
             message: 'email or password cant be empty'
         })
     }
-    // const rawData = await redisClient.getAsync(requestId);
-    // resultJSON = await JSON.parse(rawData);
-    // const {userNewSecretKey} = await resultJSON
-    // email = Decryption(email, userNewSecretKey)
-    // password = Decryption(password, userNewSecretKey)
+    const rawData = await redisClient.getAsync(requestId);
+    resultJSON = await JSON.parse(rawData);
+    const {userNewSecretKey} = await resultJSON
+    email = Decryption(email, userNewSecretKey)
+    password = Decryption(password, userNewSecretKey)
     console.log("email :"+email , "password : "+password)
 
     const check = await validator.validate(email);
@@ -166,7 +166,8 @@ const login = async (req, res) => {
 
     email = Decryption(email, userSecretKey)
     password = Decryption(password, userSecretKey)
-    
+
+    console.log("email : "+email)
     const userData = await User.findOne({ email })
     if (!userData) {
         return res.json({
@@ -174,6 +175,17 @@ const login = async (req, res) => {
             message: 'Email address not found'
         })
     }
+    await bcrypt.compare(password, userData.password, function(err, result) {
+        if(err) {
+            console.log(err)
+         }
+         if(!result){
+             return res.json({
+                 status: false,
+                 message: 'Invalid password'
+             })
+         }
+    });
     const {_id} = userData   
     const user = { name: email }
 
