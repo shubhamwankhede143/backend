@@ -127,7 +127,7 @@ const register = async (req, res) => {
             email: email,
             picture: req.body.picture,
             banner: req.body.banner,
-            role: req.body.role,
+            role: '2',
             socialAccount: social,
             password: hash,
             status: "User Registered"
@@ -177,6 +177,12 @@ const login = async (req, res) => {
                     message: 'User not found'
                 })
             }
+            if(userDetail.role!='1'){
+                return res.json({
+                    status: false,
+                    message: 'Unauthorized access'
+                })
+            }
             console.log(userDetail)
             console.log("password :" +password ,"hash : "+userDetail[0].password)
             await bcrypt.compare(password, userDetail[0].password, async(err, result) => {
@@ -207,6 +213,7 @@ const login = async (req, res) => {
                         result: {
                             authToken: authToken,
                             userId: _id,
+                            role : userDetail.role,
                             apiEncryptionKey: newApiEncryptionKey,
                             requestId: newRequestId
                         }
