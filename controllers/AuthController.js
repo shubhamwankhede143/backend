@@ -168,23 +168,41 @@ const login = async (req, res) => {
     password = Decryption(password, userSecretKey)
 
     console.log('Email :' + email + ' ' + 'Password :' + password)
-    const userData = await User.findOne({ email })
-    console.log(userData.password)
-    if (!userData) {
-        return res.json({
-            status: false,
-            message: 'Email address not found'
-        })
-    }
-    console.log("password :"+password)
-    await bcrypt.compare(password, userData.password, function(err, isMatch) {
-      if (!isMatch) {
-           res.json({
-              status: false,
-              message: 'Invalid password'
-          })
+    const userData = await User.find({email: email})
+    .exec()
+    .then(userDetail=>{
+        if(userDetail.length<1){
+            return res.status(401).json({
+                    status:false,
+                    message: 'Auth failed'
+            })
         }
-      })
+        bcrypt.compare(password, user.password,(err,res)=>{
+            if(err){
+                return res.status(401).json({
+                    status:false,
+                    message: 'Auth failed'
+                })
+            }
+        })
+    })
+    // const userData = await User.findOne({ email })
+    // console.log(userData.password)
+    // if (!userData) {
+    //     return res.json({
+    //         status: false,
+    //         message: 'Email address not found'
+    //     })
+    // }
+    // console.log("password :"+password)
+    // await bcrypt.compare(password, userData.password, function(err, isMatch) {
+    //   if (!isMatch) {
+    //        res.json({
+    //           status: false,
+    //           message: 'Invalid password'
+    //       })
+    //     }
+    //   })
 
     const {_id} = userData   
     const user = { name: email }
