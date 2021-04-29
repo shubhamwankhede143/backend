@@ -213,8 +213,8 @@ const login = async (req, res) => {
                         status: true,
                         result: {
                             authToken: authToken,
-                            userId: _id,
-                            role : userDetail.role,
+                            userId: userDetail[0]._id,
+                            role : userDetail[0].role,
                             apiEncryptionKey: newApiEncryptionKey,
                             requestId: newRequestId
                         }
