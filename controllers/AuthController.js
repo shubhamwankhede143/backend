@@ -177,7 +177,8 @@ const login = async (req, res) => {
                     message: 'User not found'
                 })
             }
-            console.log("password :" +password ,"hash : "+userDetail.password)
+            console.log(userDetail)
+            console.log("password :" +password ,"hash : "+userDetail[0].password)
             bcrypt.compare(password, userDetail[0].password, async (err, result) => {
                 if (err) {
                     return res.json({
