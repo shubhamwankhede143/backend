@@ -178,13 +178,13 @@ const login = async (req, res) => {
                 })
             }
             console.log("password :" +password ,"hash : "+userDetail.password)
-            bcrypt.compare(password, userDetail.password, async (err, result) => {
-                // if (err) {
-                //     return res.json({
-                //         status: false,
-                //         message: 'Error While verifying password'
-                //     })
-                // }
+            bcrypt.compare(password, userDetail[0].password, async (err, result) => {
+                if (err) {
+                    return res.json({
+                        status: false,
+                        message: 'Error While verifying password'
+                    })
+                }
                 if (result) {
                     const { _id } = userDetail
                     const user = { name: email }
