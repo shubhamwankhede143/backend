@@ -167,14 +167,16 @@ const login = async (req, res) => {
     email = Decryption(email, userSecretKey)
     password = Decryption(password, userSecretKey)
 
-    console.log("email : "+email)
+    console.log('Email :' + email + ' ' + 'Password :' + password)
     const userData = await User.findOne({ email })
+    console.log(userData.password)
     if (!userData) {
         return res.json({
             status: false,
             message: 'Email address not found'
         })
     }
+    console.log("password :"+password)
     await bcrypt.compare(password, userData.password, function(err, isMatch) {
         if (err) {
           throw err
