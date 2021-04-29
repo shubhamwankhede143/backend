@@ -175,17 +175,17 @@ const login = async (req, res) => {
             message: 'Email address not found'
         })
     }
-    // await bcrypt.compare(password, userData.password, function(err, result) {
-    //     if(err) {
-    //         console.log(err)
-    //      }
-    //      if(!result){
-    //          return res.json({
-    //              status: false,
-    //              message: 'Invalid password'
-    //          })
-    //      }
-    // });
+    await bcrypt.compare(password, userData.password, function(err, isMatch) {
+        if (err) {
+          throw err
+        } else if (!isMatch) {
+          return res.json({
+              status: false,
+              message: 'Invalid password'
+          })
+        }
+      })
+
     const {_id} = userData   
     const user = { name: email }
 
