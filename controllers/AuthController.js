@@ -170,7 +170,7 @@ const login = async (req, res) => {
     console.log('Email :' + email + ' ' + 'Password :' + password)
     const userData = await User.find({ email: email })
         .exec()
-        .then(userDetail => {
+        .then(async userDetail => {
             if (userDetail.length < 1) {
                 return res.json({
                     status: false,
@@ -179,7 +179,7 @@ const login = async (req, res) => {
             }
             console.log(userDetail)
             console.log("password :" +password ,"hash : "+userDetail[0].password)
-            bcrypt.compare(password, userDetail[0].password, async (err, result) => {
+            await bcrypt.compare(password, userDetail[0].password, async (err, result) => {
                 if (err) {
                     console.log("Error While verifying password")
                     return res.json({
