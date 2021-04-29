@@ -172,14 +172,14 @@ const login = async (req, res) => {
     .exec()
     .then(userDetail=>{
         if(userDetail.length<1){
-            return res.status(401).json({
+            return res.json({
                     status:false,
                     message: 'Auth failed'
             })
         }
          bcrypt.compare(password, userDetail.password,(err,res)=>{
             if(err){
-                return res.status(401).json({
+                return res.json({
                     status:false,
                     message: 'Auth failed'
                 })
