@@ -177,13 +177,20 @@ const login = async (req, res) => {
                     message: 'Auth failed'
             })
         }
-        await bcrypt.compare(password, userDetail.password,(err,res)=>{
+         bcrypt.compare(password, userDetail.password,(err,res)=>{
             if(err){
                 return res.status(401).json({
                     status:false,
                     message: 'Auth failed'
                 })
             }
+        })
+    }).catch(err =>{
+        console.log(err)
+        res.status(500).json({
+            status:false,
+            error: err,
+            message: 'Auth failed'
         })
     })
     // const userData = await User.findOne({ email })
