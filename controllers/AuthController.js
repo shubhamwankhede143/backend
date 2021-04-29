@@ -181,14 +181,6 @@ const login = async (req, res) => {
             console.log("password :" +password ,"hash : "+userDetail[0].password)
             await bcrypt.compare(password, userDetail[0].password, async(err, result) => {
                 console.log(err+"   "+result)
-
-                if (err) {
-                    console.log("Error While verifying password")
-                    return res.json({
-                        status: false,
-                        message: 'Error While verifying password'
-                    })
-                }
                 if (result) {
                     console.log("password verified successfully")
                     const { _id } = userDetail
