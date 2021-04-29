@@ -194,7 +194,6 @@ const login = async (req, res) => {
                     const userDetails = {
                         "newRequestId": newRequestId,
                         "userNewSecretKey": userNewSecretKey,
-
                     }
 
                     await client.set(newRequestId, JSON.stringify(userDetails));
