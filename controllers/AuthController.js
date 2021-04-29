@@ -177,14 +177,14 @@ const login = async (req, res) => {
                     message: 'Auth failed'
                 })
             }
-            bcrypt.compare(password, userDetail.password, async (err, res) => {
+            bcrypt.compare(password, userDetail.password, async (err, result) => {
                 if (err) {
                     return res.json({
                         status: false,
                         message: 'Auth failed'
                     })
                 }
-                if (res) {
+                if (result) {
                     const { _id } = userDetail
                     const user = { name: email }
 
