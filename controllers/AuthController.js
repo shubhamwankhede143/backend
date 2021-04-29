@@ -181,7 +181,13 @@ const login = async (req, res) => {
             console.log("password :" +password ,"hash : "+userDetail[0].password)
             await bcrypt.compare(password, userDetail[0].password, async(err, result) => {
                 console.log(err+"   "+result)
-                if (result) {
+                if(!result){
+                    return res.json({
+                        status:false,
+                        message:'Invalid username or password'
+                    })
+                }
+                else {
                     console.log("password verified successfully")
                     const { _id } = userDetail
                     const user = { name: email }
