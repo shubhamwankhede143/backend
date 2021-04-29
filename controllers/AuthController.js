@@ -177,8 +177,8 @@ const login = async (req, res) => {
                     message: 'User not found'
                 })
             }
-            console.log(userDetail.role)
-            if(userDetail.role!='1'){
+            console.log(userDetail[0].role)
+            if(userDetail[0].role!='1'){
                 return res.json({
                     status: false,
                     message: 'Unauthorized access'
