@@ -166,7 +166,7 @@ const login = async (req, res) => {
 
     email = Decryption(email, userSecretKey)
     password = Decryption(password, userSecretKey)
-    email = email.toLowerCase();
+    // email = email.toLowerCase();
 
     console.log('Email :' + email + ' ' + 'Password :' + password)
     const userData = await User.find({ email: email })
