@@ -94,10 +94,13 @@ const getAllPost = async (req, res, next) => {
         .limit(size)
         .skip(size * page)
         .then((results) => {
-            return res.json({
-                page: page + 1,
-                size: size,
-                results: results
+            Post.countDocuments({}, (err, count) => {
+                return res.json({
+                    page: page + 1,
+                    size: size,
+                    totalElements: count,
+                    results: results
+                })
             })
         })
         .catch((err) => {

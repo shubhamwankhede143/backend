@@ -68,7 +68,7 @@ const getUserDetails = async (req, res) => {
 const updateUser = async (req, res) => {
 
     const id = req.params.userId;
-
+    
     User.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
         .then(data => {
             if (!data) {
@@ -103,7 +103,7 @@ const register = async (req, res) => {
     email = Decryption(email, userNewSecretKey)
     password = Decryption(password, userNewSecretKey)
     console.log("email :" + email, "password : " + password)
-
+    email = email.toLowerCase();
     const check = await validator.validate(email);
     if (!check) {
         return res.json({
@@ -166,6 +166,7 @@ const login = async (req, res) => {
 
     email = Decryption(email, userSecretKey)
     password = Decryption(password, userSecretKey)
+    email = email.toLowerCase();
 
     console.log('Email :' + email + ' ' + 'Password :' + password)
     const userData = await User.find({ email: email })
@@ -260,10 +261,13 @@ const getAllUser = async (req, res, next) => {
         .limit(size)
         .skip(size * page)
         .then((results) => {
-            return res.json({
-                page: page + 1,
-                size: size,
-                results: results
+            User.countDocuments({}, (err, count) => {
+                return res.json({
+                    page: page + 1,
+                    size: size,
+                    totalElements: count,
+                    results: results
+                })
             })
         })
         .catch((err) => {
