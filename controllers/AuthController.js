@@ -7,6 +7,7 @@ var validator = require("email-validator");
 const asyncRedis = require("async-redis");
 const redisClient = require('../redis-client');
 const NodeRSA = require('node-rsa');
+const authPermissions = require('../controllers/middleware');
 
 const PORT = process.env.PORT || 3000;
 const REDIS_PORT = process.env.PORT || 6379;
@@ -64,6 +65,53 @@ const getUserDetails = async (req, res) => {
                 .send({ message: "Error retrieving User with id=" + id });
         });
 }
+
+
+// const changeUserPassword = async (req, res) => {
+
+//     const id = req.params.userId;
+
+//     User.findById(id)
+//         .then(data => {
+//             if (!data)
+//                 res.status(404).json({
+//                     status: false,
+//                     message: "Not found User with id " + id
+//                 });
+//             else {
+//                 await bcrypt.compare(req.body.password, data[0].password, async(err, result) => {
+//                     console.log(err+"   "+result)
+//                     if(!result){
+//                         return res.json({
+//                             status:false,
+//                             message:'Invalid current password'
+//                         })
+//                     }
+//             }
+//         })
+//         .catch(err => {
+//             res.status(500)
+//                 .send({ message: "Error retrieving User with id=" + id });
+//         });
+
+//     User.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+//     .then(data => {
+//         if (!data) {
+//             res.status(404).json({
+//                 status: false,
+//                 message: `Cannot update User with id=${id}. Maybe User was not found!`
+//             });
+//         } else res.json({
+//             status: true,
+//             message: "User updated successfully."
+//         });
+//     })
+//     .catch(err => {
+//         res.status(500).send({
+//             message: "Error updating User with id=" + id
+//         });
+//     });
+// }
 
 const updateUser = async (req, res) => {
 

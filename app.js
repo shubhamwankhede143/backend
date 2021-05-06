@@ -7,6 +7,7 @@ const AuthRoutes = require('./routes/auth')
 const PostRoutes = require('./routes/post')
 const FileRoutes = require('./routes/file')
 const TagRoutes = require('./routes/tag')
+const CategoryRoute = require('./routes/category')
 const bodyParser = require('body-parser')
 const isDevMode = process.env.NODE_ENV === 'development';
 const app = express()
@@ -119,6 +120,7 @@ app.use('/api', AuthRoutes)
 app.use('/api', PostRoutes)
 app.use('/api', FileRoutes)
 app.use('/api', TagRoutes)
+app.use('/api', CategoryRoute)
 
 
 function randomStr(len, arr) {

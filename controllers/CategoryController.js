@@ -1,54 +1,54 @@
-const Tag = require("../models/Tag")
+const Category = require("../models/Category")
 
 
-const createTag = async (req, res, next) => {
-    let tag = new Tag({
+const createCategory = async (req, res, next) => {
+    let category = new Category({
+        userId: req.body.userId,
         title: req.body.title,
         slug: req.body.slug,
-        status: req.body.status,
-        action: req.body.action
+       
     })
 
-    tag.save()
+    category.save()
         .then(tag => {
             return res.json({
                 tag: tag,
                 status: true,
-                message: 'Tag Added Successfully'
+                message: 'Category Added Successfully'
             })
         })
         .catch(error => {
             return res.json({
                 status: false,
-                message: 'Error occured while adding tag'
+                message: 'Error occured while adding category'
             })
         })
 }
 
-const getTag = (req, res) => {
-    const id = req.params.tagId;
+const getCategory = (req, res) => {
+    const id = req.params.categoryId;
 
-    Tag.findById(id)
+    Category.findById(id)
         .then(data => {
             if (!data)
                 res.status(404).json({
                     status: false,
-                    message: "Not found Tag with id " + id
+                    message: "Not found Category with id " + id
                 });
             else res.json({
                 status: true,
-                message: 'Tag data retrieved successfully',
+                message: 'Category data retrieved successfully',
                 result: data
             });
         })
         .catch(err => {
             res
                 .status(500)
-                .send({ message: "Error retrieving Tag with id=" + id });
+                .send({ message: "Error retrieving Category with id=" + id });
         });
 }
 
-const updateTag = (req, res) => {
+const updateCategory = (req, res) => {
     if (!req.body) {
         return res.status(400).json({
             message: "Data to update can not be empty!"
@@ -56,39 +56,39 @@ const updateTag = (req, res) => {
     }
 
 
-    const id = req.params.tagId;
+    const id = req.params.categoryId;
 
-    Tag.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    Category.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
         .then(data => {
             if (!data) {
                 res.status(404).json({
                     status: false,
-                    message: `Cannot update Tag with id=${id}. Maybe Tag was not found!`
+                    message: `Cannot update Category with id=${id}. Maybe Tag was not found!`
                 });
             } else res.json({
                 status: true,
-                message: "Tag updated successfully."
+                message: "Category updated successfully."
             });
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating Tag with id=" + id
+                message: "Error updating Category with id=" + id
             });
         });
 }
 
 
-const getAllTag = async (req, res, next) => {
+const getAllCategory = async (req, res, next) => {
     var { page, size } = req.body
     var { field, order } = req.body.sortBy
     page = page - 1
-    Tag.find(req.body.condition)
-        .select("title slug status action createdAt updatedAt")
+    Category.find(req.body.condition)
+        .select("userId title slug createdAt updatedAt")
         .sort({ field: order })
         .limit(size)
         .skip(size * page)
         .then((results) => {
-            Tag.countDocuments({}, (err, count) => {
+            Category.countDocuments({}, (err, count) => {
                 return res.json({
                     page: page + 1,
                     size: size,
@@ -103,5 +103,5 @@ const getAllTag = async (req, res, next) => {
 }
 
 module.exports = {
-    createTag, getAllTag,getTag,updateTag
+    createCategory, getAllCategory,getCategory,updateCategory
 }

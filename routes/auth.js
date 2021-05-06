@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const authPermissions = require('../controllers/middleware');
 const AuthController = require('../controllers/AuthController')
 
 /**
@@ -108,7 +108,7 @@ router.post('/init',AuthController.init)
  *         schema:
  *           $ref: '#/definitions/User'
  */
-router.post('/register',AuthController.register)
+router.post('/register',authPermissions.authPermissions(['1']),AuthController.register)
 
 
 /**
@@ -142,6 +142,6 @@ router.get('/user/:userId',AuthController.getUserDetails)
 router.put('/user/:userId',AuthController.updateUser)
 
 
-router.post('/users',AuthController.getAllUser)
+router.post('/users',authPermissions.authPermissions(['admin']),AuthController.getAllUser)
 
 module.exports = router
