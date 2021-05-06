@@ -264,6 +264,7 @@ const login = async (req, res) => {
                             authToken: authToken,
                             userId: userDetail[0]._id,
                             role : userDetail[0].role,
+                            username : userDetail[0].name,
                             apiEncryptionKey: newApiEncryptionKey,
                             requestId: newRequestId
                         }
