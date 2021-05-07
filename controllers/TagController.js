@@ -79,21 +79,29 @@ const updateTag = (req, res) => {
 
 
 const getAllTag = async (req, res, next) => {
-    var { page, size } = req.body
-    var { field, order } = req.body.sortBy
-    page = page - 1
-    Tag.find(req.body.condition)
+    // var { page, size } = req.body
+    // var { field, order } = req.body.sortBy
+    // page = page - 1
+    Tag.find({})
         .select("title slug status action createdAt updatedAt")
-        .sort({ field: order })
-        .limit(size)
-        .skip(size * page)
+        // .sort({ field: order })
+        // .limit(size)
+        // .skip(size * page)
         .then((results) => {
             Tag.countDocuments({}, (err, count) => {
+                const resultData = results.map(function(item){
+                    var map1 = new Map();
+                    // adding some elements to the map 
+                    map1.set(item._id , item.title);
+                    return strMapToObj(map1);
+                })
+            
+                console.log(resultData)
                 return res.json({
-                    page: page + 1,
-                    size: size,
+                    status:true,
+                    message:'Data fetched successfully',
                     totalElements: count,
-                    results: results
+                    results: resultData
                 })
             })
         })
@@ -101,6 +109,20 @@ const getAllTag = async (req, res, next) => {
             return res.status(500).send(err);
         });
 }
+
+function strMapToObj(strMap) {
+    let obj = Object.create(null);
+    for (let [k,v] of strMap) {
+      // We don’t escape the key '__proto__'
+      // which can cause problems on older engines
+      obj[k] = v;
+    }
+    return obj;
+  }
+
+  function strMapToJson(strMap) {
+    return JSON.stringify(strMapToObj(strMap));
+  }
 
 module.exports = {
     createTag, getAllTag,getTag,updateTag
