@@ -67,51 +67,53 @@ const getUserDetails = async (req, res) => {
 }
 
 
-// const changeUserPassword = async (req, res) => {
+const changeUserPassword = async (req, res) => {
 
-//     const id = req.params.userId;
+    var requestId = req.header('requestId')
+    const value = await client.get(requestId);
+    resultJSON = JSON.parse(value);
+    const { userSecretKey } = await resultJSON
+    var currentPassword = req.body.currentPassword
+    var newPassword = req.body.newPassword
+    console.log(currentPassword+ '  '+ newPassword)
 
-//     User.findById(id)
-//         .then(data => {
-//             if (!data)
-//                 res.status(404).json({
-//                     status: false,
-//                     message: "Not found User with id " + id
-//                 });
-//             else {
-//                 await bcrypt.compare(req.body.password, data[0].password, async(err, result) => {
-//                     console.log(err+"   "+result)
-//                     if(!result){
-//                         return res.json({
-//                             status:false,
-//                             message:'Invalid current password'
-//                         })
-//                     }
-//             }
-//         })
-//         .catch(err => {
-//             res.status(500)
-//                 .send({ message: "Error retrieving User with id=" + id });
-//         });
-
-//     User.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
-//     .then(data => {
-//         if (!data) {
-//             res.status(404).json({
-//                 status: false,
-//                 message: `Cannot update User with id=${id}. Maybe User was not found!`
-//             });
-//         } else res.json({
-//             status: true,
-//             message: "User updated successfully."
-//         });
-//     })
-//     .catch(err => {
-//         res.status(500).send({
-//             message: "Error updating User with id=" + id
-//         });
-//     });
-// }
+    currentPassword = Decryption(currentPassword, userSecretKey)
+    newPassword = Decryption(newPassword, userSecretKey)
+    const id = req.params.userId;
+    User.findById(id)
+    .then(async data => {
+        console.log(data.password)
+        if (!data) {
+            res.status(404).json({
+                status: false,
+                message: `Cannot update password with id=${id}. Maybe User was not found!`
+            });
+        } else {
+            await bcrypt.compare(currentPassword, data.password, async(err, result) => {
+                if(result){
+                    bcrypt.hash(newPassword, 8, async function (err, hash) {
+                        await User.findByIdAndUpdate(id, {$set: {"password":hash}}, { useFindAndModify: true })
+                        return res.json({
+                            status : true,
+                            message : 'Password updated successfully'
+                        })
+                    })
+                    
+                }else{
+                    return res.status(500).json({
+                        status : false,
+                        message : 'Invalid current password'
+                    })
+                }
+            });
+        }
+    })
+    .catch(err => {
+        res.status(500).send({
+            message: "Error updating User with id=" + id
+        });
+    });
+}
 
 const updateUser = async (req, res) => {
 
@@ -145,11 +147,11 @@ const register = async (req, res) => {
             message: 'email or password cant be empty'
         })
     }
-    const rawData = await redisClient.getAsync(requestId);
-    resultJSON = await JSON.parse(rawData);
-    const { userNewSecretKey } = await resultJSON
-    email = Decryption(email, userNewSecretKey)
-    password = Decryption(password, userNewSecretKey)
+    // const rawData = await redisClient.getAsync(requestId);
+    // resultJSON = await JSON.parse(rawData);
+    // const { userNewSecretKey } = await resultJSON
+    // email = Decryption(email, userNewSecretKey)
+    // password = Decryption(password, userNewSecretKey)
     console.log("email :" + email, "password : " + password)
     email = email.toLowerCase();
     const check = await validator.validate(email);
@@ -396,5 +398,5 @@ function isEmailValid(email) {
 }
 
 module.exports = {
-    register, init, getUserDetails, login, getAllUser, updateUser
+    register, init, getUserDetails, login, getAllUser, updateUser,changeUserPassword
 }
