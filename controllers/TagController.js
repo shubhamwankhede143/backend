@@ -113,22 +113,24 @@ const getAllTagDropdown = async (req, res, next) => {
 const deleteTag = async (req, res) => {
     const id = req.params.tagId;
     Tag.findByIdAndRemove(id)
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `Cannot delete Tag with id=${id}. Maybe Tag was not found!`
-          });
-        } else {
-          res.send({
-            message: "Tag was deleted successfully!"
-          });
+    .then(data =>{
+        if(!data){
+            return res.status(404).json({
+                status:false,
+                message:'Tag data not found'
+            })
+        }else {
+            return res.status(200).json({
+                status:true,
+                message:'Tag data deleted successfully'
+            })
         }
-      })
-      .catch(err => {
+    }).catch(err => {
         res.status(500).send({
-          message: "Could not delete Tag with id=" + id
-        });
-      });
+            message: "Could not delete Tag with id=" + id,
+            error : err
+        }); 
+    })
   };
 
   const getAllTag = async (req, res, next) => {
