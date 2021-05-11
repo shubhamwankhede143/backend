@@ -307,7 +307,7 @@ const getAllUser = async (req, res, next) => {
     const { order, field } = req.body.sortBy
     page = page - 1
     await User.find(req.body.conditions)
-        .select("name email banner picture role socialAccount status")
+        .select("name email banner picture role socialAccount createdAt status")
         .sort({ field: order })
         .limit(size)
         .skip(size * page)

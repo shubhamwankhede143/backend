@@ -1,5 +1,5 @@
 const Post = require("../models/Post")
-
+const authPermissions = require('../controllers/middleware');
 
 
 const createPost = async (req, res, next) => {
@@ -89,7 +89,7 @@ const getAllPost = async (req, res, next) => {
     var { field, order } = req.body.sortBy
     page = page - 1
     Post.find(req.body.condition)
-        .select("postId userId tagIds picture title slug content sortDescription status verifiedBy")
+        .select("postId userId tagIds picture title slug content sortDescription status createdAt verifiedBy")
         .sort({ field: order })
         .limit(size)
         .skip(size * page)
@@ -114,7 +114,7 @@ const getAllPostByTagIds = async (req, res, next) => {
     page = page - 1
     var count;
     Post.find({ "tagIds": { $in: req.body.tagIds } })
-        .select("postId userId tagIds picture title slug content sortDescription status verifiedBy")
+        .select("postId userId tagIds picture title slug content sortDescription status createdAt verifiedBy")
         .sort({ field: order })
         .limit(size)
         .skip(size * page)
