@@ -140,6 +140,7 @@ router.post('/login',AuthController.login)
 router.get('/user/:userId',AuthController.getUserDetails)
 
 router.put('/user/:userId',AuthController.updateUser)
+router.delete('/user/:userId',AuthController.deleteUser)
 router.put('/user/changepass/:userId',AuthController.changeUserPassword)
 
 //

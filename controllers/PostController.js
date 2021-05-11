@@ -159,6 +159,26 @@ const getPostCount = async (req, res)=>{
     })
 }
 
+const deletePost = async (req, res) => {
+    const id = req.params.postId;
+    Post.findByIdAndRemove(id)
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            message: `Cannot delete Post with id=${id}. Maybe Post was not found!`
+          });
+        } else {
+          res.send({
+            message: "Post was deleted successfully!"
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete Post with id=" + id
+        });
+      });
+  };
 
 // const getAllPost = async (req, res, next) => {
 
@@ -190,6 +210,6 @@ const getPostCount = async (req, res)=>{
 
 
 module.exports = {
-    createPost, getAllPost, updatePost, getPost, getAllPostByTagIds,getPostCount
+    createPost, getAllPost, updatePost, getPost, getAllPostByTagIds,getPostCount,deletePost
 }
 //getPostCount

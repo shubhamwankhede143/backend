@@ -326,10 +326,33 @@ const getAllUser = async (req, res, next) => {
         });
 }
 
+
+const deleteUser = async (req, res) => {
+    const id = req.params.userId;
+    User.findByIdAndRemove(id)
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            message: `Cannot delete User with id=${id}. Maybe User was not found!`
+          });
+        } else {
+          res.send({
+            message: "User was deleted successfully!"
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete User with id=" + id
+        });
+      });
+  };
+
 function validateEmail(email) {
     var re = /\S+@\S+\.\S+/;
     return re.test(email);
 }
+
 
 const Encryption = (data, userSecretKey) => {
     let passPhrase = userSecretKey;
@@ -398,5 +421,5 @@ function isEmailValid(email) {
 }
 
 module.exports = {
-    register, init, getUserDetails, login, getAllUser, updateUser,changeUserPassword
+    register, init, getUserDetails, login, getAllUser, updateUser,changeUserPassword,deleteUser
 }

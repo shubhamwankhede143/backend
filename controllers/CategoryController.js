@@ -77,6 +77,26 @@ const updateCategory = (req, res) => {
         });
 }
 
+const deleteCategory = async (req, res) => {
+    const id = req.params.categoryId;
+    Category.findByIdAndRemove(id)
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            message: `Cannot delete Category with id=${id}. Maybe Category was not found!`
+          });
+        } else {
+          res.send({
+            message: "Category was deleted successfully!"
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete Category with id=" + id
+        });
+      });
+  };
 
 const getAllCategory = async (req, res, next) => {
     var { page, size } = req.body
@@ -103,5 +123,5 @@ const getAllCategory = async (req, res, next) => {
 }
 
 module.exports = {
-    createCategory, getAllCategory,getCategory,updateCategory
+    createCategory, getAllCategory,getCategory,updateCategory,deleteCategory
 }

@@ -23,6 +23,27 @@ const createFile = async (req, res, next) => {
         })
 }
 
+const deleteFile = async (req, res) => {
+    const id = req.params.url;
+    Tag.findByIdAndRemove(id)
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            message: `Cannot delete File with id=${id}. Maybe File was not found!`
+          });
+        } else {
+          res.send({
+            message: "File was deleted successfully!"
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete File with id=" + id
+        });
+      });
+  };
+
 module.exports = {
-    createFile
+    createFile,deleteFile
 }

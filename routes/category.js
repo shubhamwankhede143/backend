@@ -8,4 +8,5 @@ router.post('/category/', authPermissions.authPermissions(['1']) ,CategoryContro
 router.post('/categories/',CategoryController.getAllCategory)
 router.put('/category/:categoryId',CategoryController.updateCategory)
 router.get('/category/:categoryId',CategoryController.getCategory)
+router.delete('/category/:categoryId',CategoryController.deleteCategory)
 module.exports = router

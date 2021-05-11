@@ -35,4 +35,5 @@ router.get('/postscount',PostController.getPostCount)
 router.post('/tagposts',PostController.getAllPostByTagIds)
 router.put('/post/:postId',PostController.updatePost)
 router.get('/post/:postId',PostController.getPost)
+router.delete('/post/:postId',PostController.deletePost)
 module.exports = router
