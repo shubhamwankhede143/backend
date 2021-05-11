@@ -78,7 +78,7 @@ const updateTag = (req, res) => {
 }
 
 
-const getAllTag = async (req, res, next) => {
+const getAllTagDropdown = async (req, res, next) => {
     // var { page, size } = req.body
     // var { field, order } = req.body.sortBy
     // page = page - 1
@@ -131,6 +131,30 @@ const deleteTag = async (req, res) => {
       });
   };
 
+  const getAllTag = async (req, res, next) => {
+    var { page, size } = req.body
+    var { field, order } = req.body.sortBy
+    page = page - 1
+    Tag.find(req.body.condition)
+        .select("title slug status action createdAt updatedAt")
+        .sort({ field: order })
+        .limit(size)
+        .skip(size * page)
+        .then((results) => {
+            Tag.countDocuments({}, (err, count) => {
+                return res.json({
+                    page: page + 1,
+                    size: size,
+                    totalElements: count,
+                    results: results
+                })
+            })
+        })
+        .catch((err) => {
+            return res.status(500).send(err);
+        });
+}
+
 function strMapToObj(strMap) {
     let obj = Object.create(null);
     for (let [k,v] of strMap) {
@@ -146,5 +170,5 @@ function strMapToObj(strMap) {
   }
 
 module.exports = {
-    createTag, getAllTag,getTag,updateTag,deleteTag
+    createTag, getAllTag,getTag,updateTag,deleteTag,getAllTagDropdown
 }
