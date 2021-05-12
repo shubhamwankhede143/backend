@@ -76,7 +76,7 @@ const updateHistory = (req, res) => {
 }
 
 const deleteHistory = async (req, res) => {
-    const id = req.params.HistoryId;
+    const id = req.params.historyId;
     History.findByIdAndRemove(id)
       .then(data => {
         if (!data) {
