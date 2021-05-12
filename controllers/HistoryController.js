@@ -9,7 +9,6 @@ const createHistory = async (req, res, next) => {
        token: req.body.token,
        status: req.body.status
     })
-
     history.save()
         .then(history => {
             return res.json({
@@ -44,7 +43,9 @@ const getHistory = (req, res) => {
         .catch(err => {
             res
                 .status(500)
-                .send({ message: "Error retrieving History with id=" + id });
+                .send({ 
+                    status:false,
+                    message: "Error retrieving History with id=" + id });
         });
 }
 
@@ -81,16 +82,19 @@ const deleteHistory = async (req, res) => {
       .then(data => {
         if (!data) {
           res.status(404).send({
+            status: false,
             message: `Cannot delete History with id=${id}. Maybe History was not found!`
           });
         } else {
           res.send({
+            status: true,
             message: "History was deleted successfully!"
           });
         }
       })
       .catch(err => {
         res.status(500).send({
+          status: false,
           message: "Could not delete History with id=" + id
         });
       });
@@ -116,7 +120,11 @@ const getAllHistory = async (req, res, next) => {
             })
         })
         .catch((err) => {
-            return res.status(500).send(err);
+            return res.status(500).json({
+                status:false,
+                message: 'Error while fetching get all history',
+                err:err
+            });
         });
 }
 
