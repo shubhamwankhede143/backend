@@ -5,8 +5,8 @@ const academySchema = new Schema({
     userId: {
         type: String,
     },
-    academyChapterId: {
-        type: String,
+    academyChapter: {
+        type: Array,
     },
     categoryId: {
         type: String,
