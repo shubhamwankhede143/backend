@@ -6,6 +6,7 @@ const swaggerUi = require('swagger-ui-express')
 const AuthRoutes = require('./routes/auth')
 const AcademyRoutes = require('./routes/academy')
 const PostRoutes = require('./routes/post')
+const HistoryRoutes = require('./routes/history')
 const WalletRoutes = require('./routes/wallet')
 const QuizRoutes = require('./routes/quiz')
 const FileRoutes = require('./routes/file')
@@ -127,6 +128,7 @@ app.use('/api', CategoryRoute)
 app.use('/api', AcademyRoutes)
 app.use('/api', QuizRoutes)
 app.use('/api', WalletRoutes)
+app.use('/api', HistoryRoutes)
 
 function randomStr(len, arr) {
     var ans = '';
