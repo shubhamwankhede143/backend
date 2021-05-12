@@ -4,6 +4,7 @@ const moongoDbConnection = require('./db/connection')
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express')
 const AuthRoutes = require('./routes/auth')
+const AcademyRoutes = require('./routes/academy')
 const PostRoutes = require('./routes/post')
 const FileRoutes = require('./routes/file')
 const TagRoutes = require('./routes/tag')
@@ -121,6 +122,7 @@ app.use('/api', PostRoutes)
 app.use('/api', FileRoutes)
 app.use('/api', TagRoutes)
 app.use('/api', CategoryRoute)
+app.use('/api', AcademyRoutes)
 
 
 function randomStr(len, arr) {
