@@ -6,6 +6,7 @@ const swaggerUi = require('swagger-ui-express')
 const AuthRoutes = require('./routes/auth')
 const AcademyRoutes = require('./routes/academy')
 const PostRoutes = require('./routes/post')
+const TransactionRoutes = require('./routes/transaction')
 const HistoryRoutes = require('./routes/history')
 const WalletRoutes = require('./routes/wallet')
 const QuizRoutes = require('./routes/quiz')
@@ -115,12 +116,7 @@ app.get('/logout', (req, res) => {
     res.send('User logged out')
 })
 
-
-
-
-// app.use('/api',AuthRoutes)
 app.use('/api', AuthRoutes)
-
 app.use('/api', PostRoutes)
 app.use('/api', FileRoutes)
 app.use('/api', TagRoutes)
@@ -129,6 +125,7 @@ app.use('/api', AcademyRoutes)
 app.use('/api', QuizRoutes)
 app.use('/api', WalletRoutes)
 app.use('/api', HistoryRoutes)
+app.use('/api', TransactionRoutes)
 
 function randomStr(len, arr) {
     var ans = '';
