@@ -18,9 +18,13 @@ const isDevMode = process.env.NODE_ENV === 'development';
 const app = express()
 const NodeRSA = require('node-rsa');
 const session = require('express-session')
+const uuid = require('uuid')
 const MongoStore = require('connect-mongo')(session);
+require('dotenv/config')
+const multer = require('multer')
 const cookieParser = require('cookie-parser')
 var cors = require('cors')
+const AWS = require('aws-sdk')
 const PORT = 8080;
 
 //enables cors
@@ -58,19 +62,6 @@ app.use(bodyParser.urlencoded({
 }))
 
 app.use(bodyParser.json())
-// // app.js
-// const definition = {  // <-----
-//   openapi: '3.0.0',
-//   info: {
-//     title: 'Express API for JSONPlaceholder',
-//     version: '1.0.0',
-//   },
-//   };
-  
-//   const options = {
-//     definition,      // <-----
-//     apis: ['./routes/*.js'],
-//   };
 
 const swaggerDefinition = {
   openapi: '3.0.0',
@@ -91,12 +82,43 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.use('/uploads',express.static('uploads'))
 
+const s3 = new AWS.S3({
+    accessKeyId: 'AKIAUYBCIHPZJKJB25LZ',
+    secretAccessKey: '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',
+}) 
+const storage = multer.memoryStorage({
+    destination:function(req, file,callback){
+        callback(null,'')
+    }
+})
+
+const upload = multer({storage}).single('video')
+
+app.post('/upload',upload,(req, res)=>{
+    let fileName = req.file.originalname.split('.')
+    console.log(req.file)
+    const fileType = fileName[fileName.length-1]
+
+    const params = {
+        Bucket:'ndx-aws-bucket',
+        Key:`${uuid.v4()}.${fileType}`,
+        Body:req.file.buffer
+    }
+
+    s3.upload(params,(error,data)=>{
+        if(error){
+            res.status(500).send(error)
+        }
+        res.status(200).send(data)
+    })
+})
 
 const user = {
     name: 'John',
     age: 18,
     nationality: 'Indian'
 }
+
 
 
 app.get('/login', (req, res) => {
@@ -135,7 +157,7 @@ function randomStr(len, arr) {
     }
     return ans;
 }
-// console.log(uuid.v1());
+
 
 app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
