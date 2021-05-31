@@ -12,6 +12,7 @@ const WalletRoutes = require('./routes/wallet')
 const QuizRoutes = require('./routes/quiz')
 const FileRoutes = require('./routes/file')
 const TagRoutes = require('./routes/tag')
+const chapterRoute = require('./routes/chapter')
 const CategoryRoute = require('./routes/category')
 const bodyParser = require('body-parser')
 const isDevMode = process.env.NODE_ENV === 'development';
@@ -148,6 +149,8 @@ app.use('/api', QuizRoutes)
 app.use('/api', WalletRoutes)
 app.use('/api', HistoryRoutes)
 app.use('/api', TransactionRoutes)
+app.use('/api', chapterRoute)
+
 
 function randomStr(len, arr) {
     var ans = '';

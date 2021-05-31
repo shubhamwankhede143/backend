@@ -1,36 +1,56 @@
 const Post = require("../models/Post")
 const authPermissions = require('../controllers/middleware');
 
-
-const createPost = async (req, res, next) => {
+const createPost = (req,res)=>{
     let post = new Post({
-        userId: req.body.userId,
-        tagIds: req.body.tagIds,
-        picture: req.body.picture,
-        title: req.body.title,
-        slug: req.body.slug,
-        content: req.body.content,
-        sortDescription: req.body.sortDescription,
-        status: req.body.status,
-        verifiedBy: req.body.verifiedBy,
+        user : req.body.userId,
     })
 
-    post.save()
-        .then(post => {
-            return res.json({
-                post: post,
-                status: true,
-                message: 'Post Added Successfully'
-            })
+    post.save(post).
+    then((post)=>{
+        return res.json({
+            status:false,
+            message:'Post saved successfully'
         })
-        .catch(error => {
-            return res.json({
-                status: false,
-                message: 'Error occured while adding post'
-            })
+    }).
+    catch(e=>{
+        return res.json({
+            status:false,
+            message:'Error while saving post'
         })
-
+    })
 }
+
+
+// const createPost = async (req, res, next) => {
+//     let post = new Post({
+//         userId: req.body.userId,
+//         tagIds: req.body.tagIds,
+//         picture: req.body.picture,
+//         title: req.body.title,
+//         slug: req.body.slug,
+//         content: req.body.content,
+//         sortDescription: req.body.sortDescription,
+//         status: req.body.status,
+//         verifiedBy: req.body.verifiedBy,
+//     })
+
+//     post.save()
+//         .then(post => {
+//             return res.json({
+//                 post: post,
+//                 status: true,
+//                 message: 'Post Added Successfully'
+//             })
+//         })
+//         .catch(error => {
+//             return res.json({
+//                 status: false,
+//                 message: 'Error occured while adding post'
+//             })
+//         })
+
+// }
 
 const getPost = (req, res) => {
     const id = req.params.postId;
@@ -61,10 +81,7 @@ const updatePost = (req, res) => {
             message: "Data to update can not be empty!"
         });
     }
-   
-
     const id = req.params.postId;
-
     Post.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
         .then(data => {
             if (!data) {
@@ -127,8 +144,6 @@ const getAllPostByTagIds = async (req, res, next) => {
                     results: results
                 })
             })
-
-
         })
         .catch((err) => {
             console.log(err)
@@ -136,24 +151,24 @@ const getAllPostByTagIds = async (req, res, next) => {
         });
 }
 
-const getPostCount = async (req, res)=>{
+const getPostCount = async (req, res) => {
     var totalPostCount;
     var totalPublishedPost;
     var totalUnPublishedPost;
     await Post.countDocuments({}, (err, count) => {
         totalPostCount = count
     })
-    await Post.countDocuments({"status":"published"}, (err, count) => {
+    await Post.countDocuments({ "status": "published" }, (err, count) => {
         totalPublishedPost = count
     })
-     await Post.countDocuments({"status":"unpublished"}, (err, count) => {
+    await Post.countDocuments({ "status": "unpublished" }, (err, count) => {
         totalUnPublishedPost = count
     })
 
     return res.json({
-        status:true,
-        message:'posts count fetched successfully',
-        totalPost : totalPostCount,
+        status: true,
+        message: 'posts count fetched successfully',
+        totalPost: totalPostCount,
         totalPublishedPost: totalPublishedPost,
         totalUnPublishedPost: totalUnPublishedPost
     })
@@ -162,23 +177,23 @@ const getPostCount = async (req, res)=>{
 const deletePost = async (req, res) => {
     const id = req.params.postId;
     Post.findByIdAndRemove(id)
-      .then(data => {
-        if (!data) {
-          res.status(404).send({
-            message: `Cannot delete Post with id=${id}. Maybe Post was not found!`
-          });
-        } else {
-          res.send({
-            message: "Post was deleted successfully!"
-          });
-        }
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: "Could not delete Post with id=" + id
+        .then(data => {
+            if (!data) {
+                res.status(404).send({
+                    message: `Cannot delete Post with id=${id}. Maybe Post was not found!`
+                });
+            } else {
+                res.send({
+                    message: "Post was deleted successfully!"
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Could not delete Post with id=" + id
+            });
         });
-      });
-  };
+};
 
 // const getAllPost = async (req, res, next) => {
 
@@ -210,6 +225,6 @@ const deletePost = async (req, res) => {
 
 
 module.exports = {
-    createPost, getAllPost, updatePost, getPost, getAllPostByTagIds,getPostCount,deletePost
+    createPost, getAllPost, updatePost, getPost, getAllPostByTagIds, getPostCount, deletePost
 }
 //getPostCount
